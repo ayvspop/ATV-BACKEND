@@ -1,0 +1,41 @@
+name: Update Data to Private Repo
+
+on:
+  schedule:
+    - cron: '*/15 * * * *' # প্রতি ১৫ মিনিট পর পর চলবে
+  workflow_dispatch: # চাইলে ম্যানুয়ালিও রান করা যাবে
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Public Repo
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Install Dependencies
+      run: |
+        pip install -r requirements.txt
+
+    - name: Fetch Data from Firebase
+      env:
+        FIREBASE_CONFIG: ${{ secrets.FIREBASE_CONFIG }}
+        DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      run: python main.py
+
+    - name: Pushes to Private Repository
+      uses: cpina/github-action-push-to-another-repository@main
+      env:
+        API_TOKEN_GITHUB: ${{ secrets.MY_PAT_TOKEN }}
+      with:
+        source-directory: '.'
+        destination-github-username: 'ayvspop' # আপনার ইউজারনেম
+        destination-repository-name: 'ATV-DATA' # আপনার প্রাইভেট রিপো নাম
+        user-email: 'action@github.com'
+        target-branch: main
+        set-cvs-path: 'data.json' # শুধুমাত্র এই ফাইলটি পুশ হবে
