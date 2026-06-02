@@ -2,8 +2,8 @@ name: Update Data to Private Repo
 
 on:
   schedule:
-    - cron: '*/15 * * * *' # প্রতি ১৫ মিনিট পর পর
-  workflow_dispatch: # ম্যানুয়ালি রান করার জন্য
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
 
 jobs:
   build:
@@ -18,7 +18,7 @@ jobs:
           python-version: '3.9'
 
       - name: Install Dependencies
-        run: pip install -r requirements.txt
+        run: pip install firebase-admin
 
       - name: Fetch Data from Firebase
         env:
@@ -32,12 +32,10 @@ jobs:
         run: |
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Action"
-          # প্রাইভেট রিপোটি ক্লোন করা
-          git clone https://x-access-token:${PAT}@github.com/ayvspop/ATV-DATA.git temp_repo
-          # নতুন তৈরি হওয়া data.json ফাইলটি প্রাইভেট রিপোর ফোল্ডারে কপি করা
-          cp data.json temp_repo/
+          # আপনার নতুন রিপোজিটরি ALL-ROUNDER ক্লোন করা হচ্ছে
+          git clone https://x-access-token:${PAT}@github.com/sptvhelpdesk-ship-it/ALL-ROUNDER.git temp_repo
+          cp ATV.json temp_repo/
           cd temp_repo
-          git add data.json
-          # যদি কোনো পরিবর্তন থাকে তবেই কেবল কমিট করবে
+          git add ATV.json
           git commit -m "Auto Update: $(date)" || exit 0
           git push origin main
