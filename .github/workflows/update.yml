@@ -33,7 +33,7 @@ jobs:
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Action"
           # ক্লোন করা এবং ফাইল পাঠানো
-          git clone https://x-access-token:${PAT}@github.com/sptvhelpdesk-ship-it/ALL-ROUNDER.git temp_repo
+          git clone https://x-access-token:${PAT}@github.com/api00007/ALL-ROUNDER.git temp_repo
           cp ATV.json temp_repo/
           cd temp_repo
           git add ATV.json
