@@ -2,8 +2,13 @@ name: Update Data to Private Repo
 
 on:
   schedule:
-    - cron: '*/15 * * * *' # গিটহাবের নিজস্ব ১৫ মিনিটের ক্রন
-  workflow_dispatch: # এটি বাইরের ওয়েবসাইট থেকে ট্রিগার করার জন্য প্রয়োজনীয়
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+# এই অংশটি দুটি রানকে একসাথে হতে দেবে না (একটাই চলবে)
+concurrency:
+  group: update-db-job
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -32,10 +37,19 @@ jobs:
         run: |
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Action"
-          # ক্লোন করা এবং ফাইল পাঠানো
+          
+          # রিপো ডিরেক্টরি পরিষ্কার রাখার জন্য
+          rm -rf temp_repo
+          
+          # ফ্রেশ ক্লোন করা
           git clone https://x-access-token:${PAT}@github.com/api00007/ALL-ROUNDER.git temp_repo
+          
           cp ATV.json temp_repo/
           cd temp_repo
+          
           git add ATV.json
+          # যদি কোনো চেঞ্জ না থাকে তবুও এরর দেবে না
           git commit -m "Auto Update: $(date)" || exit 0
-          git push origin main
+          
+          # ফোর্স পুশ (Force Push) করা যাতে লক এরর না আসে
+          git push origin main --force
